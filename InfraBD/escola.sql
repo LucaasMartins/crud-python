@@ -7,46 +7,48 @@ SET client_min_messages = warning;
  
 DROP TABLE IF EXISTS alunos;
 
-CREATE TABLE alunos (
-    id_aluno (INT AUTO_INCREMENT PRIMARY KEY),
-    nome_completo (VARCHAR(255) NOT NULL),
-    data_nascimento (DATE NOT NULL),
-    id_turma (FOREIGN KEY INT),
-    nome_responsavel (VARCHAR(255) NOT NULL),
-    telefone_responsavel (VARCHAR(20) NOT NULL),
-    email_responsavel (VARCHAR(100) NOT NULL),
-    informacoes_adicionais (TEXT),
-    FOREIGN KEY (id_turma) REFERENCES turma(id_turma)
+
+CREATE TABLE professor (
+  id_professor SERIAL PRIMARY KEY,
+  nome_completo VARCHAR(255),
+  email VARCHAR(100),
+  telefone VARCHAR(20)
 );
 
 CREATE TABLE turma (
-  id_turma INT PRIMARY KEY AUTO_INCREMENT,
+  id_turma SERIAL PRIMARY KEY,
   nome_turma VARCHAR(50),
   id_professor INT,
-  horario VARCHAR(100)
+  horario VARCHAR(100),
   FOREIGN KEY (id_professor) REFERENCES professor(id_professor)
 );
 
-CREATE TABLE professor (
-  id_professor PRIMARY KEY INT AUTO_INCREMENT,
-  nome_completo VARCHAR(255),
-  email VARCHAR(100),
-  telefone VARCHAR(20),
+CREATE TABLE alunos (
+    id_aluno SERIAL PRIMARY KEY,
+    nome_completo VARCHAR(255) NOT NULL,
+    data_nascimento DATE NOT NULL,
+    id_turma INT,
+    nome_responsavel VARCHAR(255) NOT NULL,
+    telefone_responsavel VARCHAR(20) NOT NULL,
+    email_responsavel VARCHAR(100) NOT NULL,
+    informacoes_adicionais TEXT,
+    FOREIGN KEY (id_turma) REFERENCES turma(id_turma)
 );
 
+
 CREATE TABLE pagamento (
-  id_pagamento PRIMARY KEY INT AUTO_INCREMENT,
+  id_pagamento SERIAL PRIMARY KEY,
   id_aluno INT,
   data_pagamento DATE,
   valor_pago DECIMAL(10,2),
   forma_pagamento VARCHAR(50),
   referencia VARCHAR(100),
   status VARCHAR(20),
-  FOREIGN KEY (id_aluno) REFERENCES alunos(id_aluno//)
+  FOREIGN KEY (id_aluno) REFERENCES alunos(id_aluno)
 );
 
 CREATE TABLE presenca (
-  id_presenca PRIMARY KEY INT AUTO_INCREMENT,
+  id_presenca SERIAL PRIMARY KEY,
   id_aluno INT,
   data_presenca DATE,
   presente BOOLEAN,
@@ -54,7 +56,7 @@ CREATE TABLE presenca (
 );
 
 CREATE TABLE atividade (
-  id_atividade PRIMARY KEY INT AUTO_INCREMENT,
+  id_atividade SERIAL PRIMARY KEY,
   descricao TEXT,
   data_realizacao DATE
 );
@@ -68,7 +70,7 @@ CREATE TABLE atividade_aluno (
 );
 
 CREATE TABLE usuario (
-  id_usuario PRIMARY KEY INT AUTO_INCREMENT,
+  id_usuario SERIAL PRIMARY KEY,
   login VARCHAR(50) UNIQUE,
   senha VARCHAR(255),
   nivel_acesso VARCHAR(20),
