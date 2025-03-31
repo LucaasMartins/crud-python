@@ -14,10 +14,12 @@ def adicionar_aluno():
     try:
         cursor.execute(
             """
-            INSERT INTO alunos (aluno_id, nome, endereco, cidade, estado, cep, pais, telefone)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO alunos (id_aluno, nome_completo, data_nascimento, nome_responsavel, telefone_responsavel,
+            email_responsavel, informacoes_adicionais))
+            VALUES (%s, %s, %s, %s, %s, %s, %s,)
             """,
-            (data['aluno_id'], data['nome'], data['endereco'], data['cidade'], data['estado'], data['cep'], data['pais'], data['telefone'])
+            (data['id_aluno'], data['nome_completo'], data['data_nascimento'], data['nome_responsavel'], data['telefone_responsavel'], 
+             data['email_responsavel'], data['informacoes_adicionais'])
         )
         conn.commit()
         return jsonify({"message": "Aluno adicionado"}), 201
@@ -28,8 +30,8 @@ def adicionar_aluno():
         cursor.close()
         conn.close()
 
-@app.route('/alunos/<int:aluno_id', methods=['GET'])
-def read_aluno(aluno_id):
+@app.route('/alunos/<int:id_aluno', methods=['GET'])
+def read_aluno(id_aluno):
     conn = bd.create_connection()
     if conn is None:
         return jsonify({"error": "Connection to DB failed"}), 500
@@ -39,20 +41,19 @@ def read_aluno(aluno_id):
             """
             SELECT * FROM alunos WHERE aluno_id = %s
             """,
-            (aluno_id,)
+            (id_aluno,)
         )
         aluno = cursor.fetchone()
         if aluno is None:
             return jsonify({"error": "Aluno não encontrado"}), 404
         return jsonify({
-            "aluno_id": aluno[0],
-            "nome": aluno[1],
-            "endereco": aluno[2],
-            "cidade": aluno[3],
-            "estado": aluno[4],
-            "cep": aluno[5],
-            "pais": aluno[6],
-            "telefone": aluno[7]
+            "id_aluno": aluno[0],
+            "nome_completo": aluno[1],
+            "data_nascimento": aluno[2],
+            "nome_responsavel": aluno[3],
+            "telefone_responsavel": aluno[4],
+            "email_responsavel": aluno[5],
+            "informacoes_adicionais": aluno[6],
         }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -60,8 +61,8 @@ def read_aluno(aluno_id):
         cursor.close()
         conn.close()
 
-@app.route('/alunos/<int:aluno_id>', methods=['PUT'])
-def update_aluno(aluno_id):
+@app.route('/alunos/<int:id_aluno>', methods=['PUT'])
+def update_aluno(id_aluno):
     data = request.get_json()
     conn = bd.create_connection()
     if conn is None:
@@ -71,10 +72,12 @@ def update_aluno(aluno_id):
         cursor.execute(
             """
             UPDATE alunos
-            SET nome = %s, endereco = %s, cidade = %s, estado = %s, cep = %s, pais = %s, telefone = %s
+            SET nome_completo = %s, data_nascimento = %s, nome_responsavel = %s, telefone_reponsavel = %s, 
+            email_reponsavel = %s, informacoes_adicionais = %s,
             WHERE aluno_id = %s
             """,
-            (data['nome'], data['endereco'], data['cidade'], data['estado'], data['cep'], data['pais'], data['telefone'], aluno_id)
+            (data['nome_completo'], data['data_nascimento'], data['nome_responsavel'], data['telefone_responsavel'], 
+             data['email_responsavel'], data['informacoes_adicionais'], id_aluno)
         )
         conn.commit()
         return jsonify({"message": "Aluno atualizado"}), 200
@@ -85,8 +88,8 @@ def update_aluno(aluno_id):
         cursor.close()
         conn.close()
 
-@app.route('/alunos/<int:aluno_id>', methods=['DELETE'])
-def delete_aluno(aluno_id):
+@app.route('/alunos/<int:id_aluno>', methods=['DELETE'])
+def delete_aluno(id_aluno):
     conn = bd.create_connection()
     if conn is None:
         return jsonify({"error": "Connection to DB failed"}), 500
@@ -94,9 +97,9 @@ def delete_aluno(aluno_id):
     try:
         cursor.execute(
             """
-            DELETE FROM alunos WHERE aluno_id = %s
+            DELETE FROM alunos WHERE id_aluno = %s
             """,
-            (aluno_id,)
+            (id_aluno,)
         )
         conn.commit()
         return jsonify({"message": "Aluno deletado"}), 200
