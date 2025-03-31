@@ -39,7 +39,7 @@ def read_aluno(id_aluno):
     try:
         cursor.execute(
             """
-            SELECT * FROM alunos WHERE aluno_id = %s
+            SELECT * FROM alunos WHERE id_aluno = %s
             """,
             (id_aluno,)
         )
