@@ -14,11 +14,11 @@ def adicionar_aluno():
     try:
         cursor.execute(
             """
-            INSERT INTO alunos (id_aluno, nome_completo, data_nascimento, nome_responsavel, telefone_responsavel,
-            email_responsavel, informacoes_adicionais))
-            VALUES (%s, %s, %s, %s, %s, %s, %s,)
+            INSERT INTO alunos (nome_completo, data_nascimento, nome_responsavel, telefone_responsavel,
+            email_responsavel, informacoes_adicionais)
+            VALUES (%s, %s, %s, %s, %s, %s)
             """,
-            (data['id_aluno'], data['nome_completo'], data['data_nascimento'], data['nome_responsavel'], data['telefone_responsavel'], 
+            (data['nome_completo'], data['data_nascimento'], data['nome_responsavel'], data['telefone_responsavel'], 
              data['email_responsavel'], data['informacoes_adicionais'])
         )
         conn.commit()
@@ -30,7 +30,7 @@ def adicionar_aluno():
         cursor.close()
         conn.close()
 
-@app.route('/alunos/<int:id_aluno', methods=['GET'])
+@app.route('/alunos/<int:id_aluno>', methods=['GET'])
 def read_aluno(id_aluno):
     conn = bd.create_connection()
     if conn is None:
@@ -72,9 +72,9 @@ def update_aluno(id_aluno):
         cursor.execute(
             """
             UPDATE alunos
-            SET nome_completo = %s, data_nascimento = %s, nome_responsavel = %s, telefone_reponsavel = %s, 
-            email_reponsavel = %s, informacoes_adicionais = %s,
-            WHERE aluno_id = %s
+            SET nome_completo = %s, data_nascimento = %s, nome_responsavel = %s, telefone_responsavel = %s, 
+            email_responsavel = %s, informacoes_adicionais = %s
+            WHERE id_aluno = %s
             """,
             (data['nome_completo'], data['data_nascimento'], data['nome_responsavel'], data['telefone_responsavel'], 
              data['email_responsavel'], data['informacoes_adicionais'], id_aluno)
