@@ -9,7 +9,7 @@ def adicionar_aluno():
     data = request.get_json()
 
     required_fields = ['nome_completo', 'data_nascimento', 'id_turma', 'nome_responsavel',
-                       'telefone_responsavel', 'email_responsavel', 'informacoes_adicionais']
+                       'telefone_responsavel', 'email_responsavel']
     
     if not all([field in data for field in required_fields]):
         return jsonify({"error": "Campos obrigatórios não preenchidos"}), 400
