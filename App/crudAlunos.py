@@ -7,11 +7,23 @@ app = Flask(__name__)
 @app.route('/alunos', methods=['POST'])
 def adicionar_aluno():
     data = request.get_json()
+
+    required_fields = ['nome_completo', 'data_nascimento', 'id_turma', 'nome_responsavel',
+                       'telefone_responsavel', 'email_responsavel', 'informacoes_adicionais']
+    
+    if not all([field in data for field in required_fields]):
+        return jsonify({"error": "Campos obrigatórios não preenchidos"}), 400
     conn = bd.create_connection()
     if conn is None:
         return jsonify({"error": "Connection to DB failed"}), 500
     cursor = conn.cursor()
     try:
+
+        cursor.execute("SELECT * FROM turmas WHERE id_turma = %s", (data['id_turma'],))
+        turma = cursor.fetchone()
+
+        if turma is None:
+            return jsonify({"error": "Turma não encontrada"}), 404
         cursor.execute(
             """
             INSERT INTO alunos (nome_completo, data_nascimento, nome_responsavel, telefone_responsavel,
