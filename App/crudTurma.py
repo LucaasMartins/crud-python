@@ -63,3 +63,51 @@ def read_turma(id_turma):
     finally:
         cursor.close()
         conn.close()
+
+@app.route('/turmas/<int:id_turma>', methods=['PUT'])
+def update_turma(id_turma):
+    data = request.get_json()
+    conn = bd.create_connection()
+    if conn is None:
+        return jsonify({"error": "Connection to DB failed"}), 500
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            UPDATE turmas
+            SET nome_turma = %s, id_professor = %s, horario = %s
+            WHERE id_turma = %s
+            """,
+            (data['nome_turma'], data['id_professor'],
+             data['horario'], id_turma)
+        )
+        conn.commit()
+        return jsonify({"message": "Turma atualizada com sucesso"}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/turmas/<int:id_turma>', methods=['DELETE'])
+def delete_turma(id_turma):
+    conn = bd.create_connection()
+    if conn is None:
+        return jsonify({"error": "Connection to DB failed"}), 500
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            DELETE FROM turmas WHERE id_turma = %s
+            """,
+            (id_turma,)
+        )
+        conn.commit()
+        return jsonify({"message": "Turma deletada com sucesso"}), 200
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
