@@ -36,3 +36,30 @@ def adicionar_turma():
         cursor.close()
         conn.close()
         
+@app.route('/turmas/<int:id_turma>', methods=['GET'])
+def read_turma(id_turma):
+    conn = bd.create_connection()
+    if conn is None:
+        return jsonify({"error": "Connection to DB failed"}), 500
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT * FROM turmas WHERE id_turma = %s
+            """,
+            (id_turma,)
+        )
+        turma = cursor.fetchone()
+        if turma is None:
+            return jsonify({"error": "Turma não encontrada"}), 404
+        return jsonify({
+            "id_turma": turma[0],
+            "nome_turma": turma[1],
+            "id_professor": turma[2],
+            "horario": turma[3],
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
