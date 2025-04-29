@@ -4,7 +4,7 @@ import base64
 
 app = Flask(__name__)
 
-@app.route('/atividades', methods=['POST'])
+@app.route('/atividade', methods=['POST'])
 def adicionar_atividade():
     data = request.get_json()
 
@@ -25,7 +25,7 @@ def adicionar_atividade():
 
         cursor.execute(
             """
-            INSERT INTO atividades (id_turma, data_atividade, tipo_atividade, descricao_atividade, observacoes_atividade)
+            INSERT INTO atividade (id_turma, data_atividade, tipo_atividade, descricao_atividade, observacoes_atividade)
             VALUES (%s, %s, %s, %s, %s)
             """,
             (data['id_turma'], data['data_atividade'], data['tipo_atividade'], data['descricao_atividade'], data['observacoes_atividade'])
@@ -39,7 +39,7 @@ def adicionar_atividade():
         cursor.close()
         conn.close()
 
-@app.route('/atividades/<int:id_atividade>', methods=['GET'])
+@app.route('/atividade/<int:id_atividade>', methods=['GET'])
 def read_atividade(id_atividade):
     conn = bd.create_connection()
     if conn is None:
@@ -49,7 +49,7 @@ def read_atividade(id_atividade):
     try:
         cursor.execute(
             """
-            SELECT * FROM atividades WHERE id_atividade = %s
+            SELECT * FROM atividade WHERE id_atividade = %s
             """,
             (id_atividade,)
         )
@@ -70,7 +70,7 @@ def read_atividade(id_atividade):
         cursor.close()
         conn.close()
 
-@app.route('/atividades/<int:id_atividade>', methods=['PUT'])
+@app.route('/atividade/<int:id_atividade>', methods=['PUT'])
 def update_atividade(id_atividade):
     data = request.get_json()
 
@@ -87,7 +87,7 @@ def update_atividade(id_atividade):
     try:
         cursor.execute(
             """
-            UPDATE atividades
+            UPDATE atividade
             SET id_turma = %s, data_atividade = %s, tipo_atividade = %s, descricao_atividade = %s, observacoes_atividade = %s
             WHERE id_atividade = %s
             """,
@@ -102,7 +102,7 @@ def update_atividade(id_atividade):
         cursor.close()
         conn.close()
 
-@app.route('/atividades/<int:id_atividade>', methods=['DELETE'])
+@app.route('/atividade/<int:id_atividade>', methods=['DELETE'])
 def delete_atividade(id_atividade):
     conn = bd.create_connection()
     if conn is None:
@@ -112,7 +112,7 @@ def delete_atividade(id_atividade):
     try:
         cursor.execute(
             """
-            DELETE FROM atividades WHERE id_atividade = %s
+            DELETE FROM atividade WHERE id_atividade = %s
             """,
             (id_atividade,)
         )
