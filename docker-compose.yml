@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     build: .
-    container_namee: flask_app
+    container_name: flask_app
     ports:
       - "5000:5000"
     volumes:
@@ -11,17 +11,46 @@ services:
     depends_on:
       - db
 
-db:
-  build: .InfraBD
-  container_name: postgres_db
-  environment:
-    POSTGRES_DB: escola
-    POSTGRES_USER: faat
-    POSTGRES_PASSWORD: faat
+  db:
+    build: ./InfraBD
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: escola
+      POSTGRES_USER: faat
+      POSTGRES_PASSWORD: faat
     ports:
-      - "3000:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    
+
+  postgres_exporter:
+    image: quay.io/prometheus/postgres-exporter
+    container_name: postgres_exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://faat:faat@db:5432/escola?sslmode=disable"
+    ports:
+      - "9187:9187"
+    depends_on:
+      - db
+
+prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres_exporter
+
+grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
 volumes:
   postgres_data:
+  grafana_data:
