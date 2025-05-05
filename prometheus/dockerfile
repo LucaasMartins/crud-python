@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 FROM prom/prometheus
+=======
+FROM prometheus:latest
+>>>>>>> main
 
 
 COPY prometheus.yml /etc/prometheus/prometheus.yml
 
 
+<<<<<<< HEAD
 EXPOSE 9090  
+=======
+EXPOSE 9090
+>>>>>>> main

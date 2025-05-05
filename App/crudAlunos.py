@@ -1,9 +1,10 @@
 import logging
 from flask import Flask, request, jsonify
 import psycopg2
+from psycopg2 import OperationalError, IntegrityError
 import yaml
 
-# Configuração do sistema de log
+
 logging.basicConfig(
     filename='escola_infantil.log',
     level=logging.INFO,
@@ -17,22 +18,22 @@ def create_connection():
         with open('Util/paramsBD.yml', 'r') as file:
             config = yaml.safe_load(file)
         connection = psycopg2.connect(
-            user=config['user'],
-            password=config['password'],
-            host=config['host'],
-            port=config['port'],
-            database=config['database']
+            user=config['db_user'],
+            password=config['db_password'],
+            host=config['db_host'],
+            port=config['db_port'],
+            database=config['db_name']
         )
         return connection
-    except Exception as e:
-        print(f"Erro ao conectar ao banco de dados: {e}")
+    except OperationalError as e:
+        logging.error(f"Erro ao conectar ao banco de dados: {e}")
         return None
 
 @app.route('/alunos', methods=['POST'])
 def adicionar_aluno():
     data = request.get_json()
 
-    # Validação de campos obrigatórios
+    
     required_fields = ['nome_completo', 'data_nascimento', 'id_turma', 'nome_responsavel',
                        'telefone_responsavel', 'email_responsavel']
     missing_fields = [field for field in required_fields if field not in data]
@@ -47,7 +48,7 @@ def adicionar_aluno():
 
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT * FROM turmas WHERE id_turma = %s", (data['id_turma'],))
+        cursor.execute("SELECT * FROM turma WHERE id_turma = %s", (data['id_turma'],))
         turma = cursor.fetchone()
 
         if turma is None:
@@ -57,12 +58,12 @@ def adicionar_aluno():
         cursor.execute(
             """
             INSERT INTO alunos (nome_completo, data_nascimento, nome_responsavel, telefone_responsavel,
-            email_responsavel, informacoes_adicionais)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            email_responsavel, informacoes_adicionais, id_turma)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id_aluno
             """,
             (data['nome_completo'], data['data_nascimento'], data['nome_responsavel'], data['telefone_responsavel'], 
-             data['email_responsavel'], data.get('informacoes_adicionais', ''))
+             data['email_responsavel'], data.get('informacoes_adicionais', ''), data['id_turma'])
         )
         id_aluno = cursor.fetchone()[0]
         conn.commit()
@@ -104,6 +105,7 @@ def read_aluno(id_aluno):
             "telefone_responsavel": aluno[4],
             "email_responsavel": aluno[5],
             "informacoes_adicionais": aluno[6],
+            "id_turma": aluno[7]
         }), 200
     except Exception as e:
         logging.error(f"READ: Erro ao consultar aluno com ID {id_aluno} - {str(e)}")
