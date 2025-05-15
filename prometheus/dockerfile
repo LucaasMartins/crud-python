@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-FROM prom/prometheus
-=======
 FROM prometheus:latest
->>>>>>> main
 
 
 COPY prometheus.yml /etc/prometheus/prometheus.yml
