@@ -1,6 +1,5 @@
 # CRUD Python - Sistema Escolar
 
-![CI/CD](https://github.com/LucaasMartins/crud-python/workflows/CI/CD%20Pipeline/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.9-blue.svg)
 ![Flask](https://img.shields.io/badge/flask-2.3.3-green.svg)
 
