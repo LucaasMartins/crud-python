@@ -12,10 +12,10 @@ def adicionar_presenca():
 
     if not all([field in data for field in required_fields]):
         return jsonify({"error": "Campos obrigatórios não preenchidos"}), 400
-    cursor = bd.create_connection()
-    if cursor is None:
+    conn = bd.create_connection()
+    if conn is None:
         return jsonify({"error": "Connection to DB failed"}), 500
-    conn = cursor.cursor()
+    cursor = conn.cursor()
     try:
         cursor.execute("SELECT * FROM alunos WHERE id_aluno = %s", (data['id_aluno'],))
         aluno = cursor.fetchone()

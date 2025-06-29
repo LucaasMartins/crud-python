@@ -1,13 +1,27 @@
-version: '3.8'
-
 services:
+  app:
+    build: .
+    container_name: escola_api
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=escola
+      - DB_USER=faat
+      - DB_PASSWORD=faat
+    networks:
+      - monitoring_network
+
   db:
     build: ./InfraBD
     container_name: postgres_db
     environment:
       POSTGRES_USER: faat
       POSTGRES_PASSWORD: faat
-      POSTGRES_DB: northwind
+      POSTGRES_DB: escola
     ports:
       - "3001:5432"
     volumes:
@@ -22,7 +36,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
     networks:
       - monitoring_network
 
@@ -46,7 +60,7 @@ services:
     image: bitnami/postgres-exporter:latest
     container_name: postgres_exporter
     environment:
-      DATA_SOURCE_NAME: "postgresql://faat:faat@db:5432/northwind?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://faat:faat@db:5432/escola?sslmode=disable"
     ports:
       - "9187:9187"
     depends_on:

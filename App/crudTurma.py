@@ -7,6 +7,12 @@ app = Flask(__name__)
 @app.route('/turmas', methods=['POST'])
 def adicionar_turma():
     data = request.get_json()
+    
+    required_fields = ['nome_completo', 'nome_turma', 'horario']
+    
+    if not all([field in data for field in required_fields]):
+        return jsonify({"error": "Campos obrigatórios não preenchidos"}), 400
+    
     conn = bd.create_connection()
     if conn is None:
         return jsonify({"error": "Connection to DB failed"}), 500

@@ -1,12 +1,17 @@
 from flask import Flask, request, jsonify
 import Util.bd as bd
-import base64
 
 app = Flask(__name__)
 
 @app.route('/usuarios', methods=['POST'])
 def adicionar_usuario():
     data = request.get_json()
+    
+    required_fields = ['login', 'senha', 'nivel_acesso', 'id_professor']
+    
+    if not all([field in data for field in required_fields]):
+        return jsonify({"error": "Campos obrigatórios não preenchidos"}), 400
+    
     conn = bd.create_connection()
     if conn is None:
         return jsonify({"error": "Connection to DB failed"}), 500

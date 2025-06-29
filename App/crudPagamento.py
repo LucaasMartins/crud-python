@@ -1,21 +1,20 @@
 from flask import Flask, request, jsonify
 import Util.bd as bd
-import base64
 
 app = Flask(__name__)
 
 @app.route('/pagamentos', methods=['POST'])
 def adicionar_pagamento():
-    data = request.get.json()
+    data = request.get_json()
 
-    required_fields = ['id_aluno', 'valor', 'data_pagamento', 'metodo_pagamento']
+    required_fields = ['id_aluno', 'valor_pago', 'data_pagamento', 'forma_pagamento']
 
     if not all([field in data for field in required_fields]):
         return jsonify({"error": "Campos obrigatórios não preenchidos"}), 400
-    cursor = bd.create_connection()
-    if cursor is None:
+    conn = bd.create_connection()
+    if conn is None:
         return jsonify({"error": "Connection to DB failed"}), 500
-    conn = cursor.cursor()
+    cursor = conn.cursor()
     try:
         cursor.execute("SELECT * FROM alunos WHERE id_aluno = %s", (data['id_aluno'],))
         aluno = cursor.fetchone()
@@ -25,10 +24,10 @@ def adicionar_pagamento():
 
         cursor.execute(
             """
-            INSERT INTO pagamentos (id_aluno, valor, data_pagamento, metodo_pagamento)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO pagamento (id_aluno, data_pagamento, valor_pago, forma_pagamento, referencia, status)
+            VALUES (%s, %s, %s, %s, %s, %s)
             """,
-            (data['id_aluno'], data['valor'], data['data_pagamento'], data['metodo_pagamento'])
+            (data['id_aluno'], data['data_pagamento'], data['valor_pago'], data['forma_pagamento'], data.get('referencia', ''), data.get('status', 'pendente'))
         )
         conn.commit()
         return jsonify({"message": "Pagamento adicionado"}), 201
@@ -48,7 +47,7 @@ def read_pagamento(id_pagamento):
     try:
         cursor.execute(
             """
-            SELECT * FROM pagamentos WHERE id_pagamento = %s
+            SELECT * FROM pagamento WHERE id_pagamento = %s
             """,
             (id_pagamento,)
         )
@@ -82,7 +81,7 @@ def update_pagamento(id_pagamento):
     try:
         cursor.execute(
             """
-            UPDATE pagamentos
+            UPDATE pagamento
             SET id_aluno = %s, data_pagamento = %s, valor_pago = %s, forma_pagamento = %s, referencia = %s, status = %s
             WHERE id_pagamento = %s
             """,
@@ -108,7 +107,7 @@ def delete_pagamento(id_pagamento):
     try:
         cursor.execute(
             """
-            DELETE FROM pagamentos WHERE id_pagamento = %s
+            DELETE FROM pagamento WHERE id_pagamento = %s
             """,
             (id_pagamento,)
         )

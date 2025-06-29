@@ -1,10 +1,13 @@
 FROM python:3.9-slim
 
-WORKDIR /
+WORKDIR /app
 
-COPY /app/requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
+RUN pip install pyyaml
 
-COPY ./app .
+COPY ./App .
 
-CMD ["python", "crudAlunos.py"]
+EXPOSE 5000
+
+CMD ["python", "main.py"]
