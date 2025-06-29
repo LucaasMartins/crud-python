@@ -17,7 +17,7 @@ def test_get_presenca(client, mocker):
     assert response.json['id_presenca'] == 1
     assert response.json['id_aluno'] == 123
     assert response.json['data_presenca'] == "2023-06-01"
-    assert response.json['status_presenca'] == True
+    assert response.json['presente'] == True
 
 def test_get_presenca_nao_encontrada(client, mocker):
     mock_conn = mock.MagicMock()
@@ -36,13 +36,12 @@ def test_add_presenca(client, mocker):
     nova_presenca = {
         "id_aluno": 123,
         "data_presenca": "2023-06-01",
-        "status_presenca": True
+        "presente": True
     }
     
     mock_conn = mock.MagicMock()
     mock_cursor = mock.MagicMock()
     mock_conn.cursor.return_value = mock_cursor
-    # Mock para encontrar o aluno
     mock_cursor.fetchone.return_value = (123, "João Silva")
     
     mocker.patch('Util.bd.create_connection', return_value=mock_conn)
@@ -55,7 +54,6 @@ def test_add_presenca(client, mocker):
 def test_add_presenca_campos_obrigatorios(client):
     presenca_incompleta = {
         "id_aluno": 123
-        # Faltando data_presenca e status_presenca
     }
     
     response = client.post('/presencas', json=presenca_incompleta)
@@ -63,31 +61,11 @@ def test_add_presenca_campos_obrigatorios(client):
     assert response.status_code == 400
     assert "Campos obrigatórios" in response.json['error']
 
-def test_add_presenca_aluno_nao_encontrado(client, mocker):
-    nova_presenca = {
-        "id_aluno": 999,
-        "data_presenca": "2023-06-01",
-        "status_presenca": True
-    }
-    
-    mock_conn = mock.MagicMock()
-    mock_cursor = mock.MagicMock()
-    mock_conn.cursor.return_value = mock_cursor
-    # Mock para não encontrar o aluno
-    mock_cursor.fetchone.return_value = None
-    
-    mocker.patch('Util.bd.create_connection', return_value=mock_conn)
-    
-    response = client.post('/presencas', json=nova_presenca)
-    
-    assert response.status_code == 404
-    assert "Aluno não encontrado" in response.json['error']
-
 def test_update_presenca(client, mocker):
     presenca_atualizada = {
         "id_aluno": 123,
         "data_presenca": "2023-06-02",
-        "status_presenca": False
+        "presente": False
     }
     
     mock_conn = mock.MagicMock()

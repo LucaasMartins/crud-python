@@ -19,8 +19,8 @@ def adicionar_professor():
     try:
         
         cursor.execute(
-            """"
-            INSERT INTO professores (nome_completo, email, telefone,)
+            """
+            INSERT INTO professor (nome_completo, email, telefone)
             VALUES (%s, %s, %s)
             """,
             (data['nome_completo'], data['email'], data['telefone'])
@@ -43,7 +43,7 @@ def read_professor(id_professor):
     try:
         cursor.execute(
             """
-            SELECT * FROM professores WHERE id_professor = %s
+            SELECT * FROM professor WHERE id_professor = %s
             """,
             (id_professor,)
         )
@@ -72,7 +72,7 @@ def update_professor(id_professor):
     try:
         cursor.execute(
             """
-            UPDATE professores
+            UPDATE professor
             SET nome_completo = %s, email = %s, telefone = %s
             WHERE id_professor = %s
             """,
@@ -88,7 +88,7 @@ def update_professor(id_professor):
         cursor.close()
         conn.close()
         
-@app.route('/professores/<int:id.professor>', methods=['DELETE'])
+@app.route('/professores/<int:id_professor>', methods=['DELETE'])
 def delete_professor(id_professor):
     conn = bd.create_connection()
     if conn is None:
@@ -97,7 +97,7 @@ def delete_professor(id_professor):
     try:
         cursor.execute(
             """
-            DELETE FROM professores WHERE id_professor = %s
+            DELETE FROM professor WHERE id_professor = %s
             """,
             (id_professor,)
         )

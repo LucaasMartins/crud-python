@@ -1,0 +1,38 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types:
+      - completed
+    branches: [main, master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Build application
+      run: |
+        echo "🔨 Building application..."
+        python -c "print('Build completed!')"
+    
+    - name: Deploy to Heroku (exemplo)
+      run: |
+        echo "🚀 Deploying to Heroku..."
+        echo "📝 Add your Heroku deployment commands here"
+        echo "✅ Deployment successful!"
+    
+    - name: Notify deployment
+      run: |
+        echo "📧 Sending deployment notification..."
+        echo "✅ Team notified of successful deployment!"

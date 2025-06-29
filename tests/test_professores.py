@@ -89,3 +89,41 @@ def test_delete_professor(client, mocker):
     
     assert response.status_code == 200
     assert "Professor deletado" in response.json['message']
+
+def test_add_professor_email_invalido(client, mocker):
+    professor_email_invalido = {
+        "nome_completo": "João Silva",
+        "email": "email_invalido",
+        "telefone": "11999999999"
+    }
+    
+    mock_conn = mock.MagicMock()
+    mock_cursor = mock.MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+    mock_cursor.execute.side_effect = Exception("Email inválido")
+    
+    mocker.patch('Util.bd.create_connection', return_value=mock_conn)
+    
+    response = client.post('/professores', json=professor_email_invalido)
+    
+    assert response.status_code == 500
+    assert "error" in response.json
+
+def test_add_professor_telefone_invalido(client, mocker):
+    professor_telefone_invalido = {
+        "nome_completo": "João Silva",
+        "email": "joao@email.com",
+        "telefone": "123"  # Telefone muito curto
+    }
+    
+    mock_conn = mock.MagicMock()
+    mock_cursor = mock.MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+    mock_cursor.execute.side_effect = Exception("Telefone inválido")
+    
+    mocker.patch('Util.bd.create_connection', return_value=mock_conn)
+    
+    response = client.post('/professores', json=professor_telefone_invalido)
+    
+    assert response.status_code == 500
+    assert "error" in response.json

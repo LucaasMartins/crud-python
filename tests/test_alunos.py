@@ -1,66 +1,101 @@
 import pytest
 from unittest import mock
 
-# Teste para obter um aluno existente
 def test_get_aluno(client, mocker):
-    aluno_mock = ("12345", "João da Silva", "Rua A, 123", "São Paulo", "SP", "01234567", "Brasil", "123456789")
-    # Mocka o retorno do banco de dados
-    mocker.patch('app.util.bd.create_connection', return_value=aluno_mock)
+    aluno_mock = (1, "João da Silva", "2000-01-01", 1, "Maria Silva", "11999999999", "maria@email.com", "Informações adicionais")
     
-    response = client.get('/alunos/12345')
+    mock_conn = mock.MagicMock()
+    mock_cursor = mock.MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+    mock_cursor.fetchone.return_value = aluno_mock
+    
+    mocker.patch('Util.bd.create_connection', return_value=mock_conn)
+    
+    response = client.get('/alunos/1')
     
     assert response.status_code == 200
-    assert response.json['aluno_id'] == '12345'
-    assert response.json['nome'] == 'João da Silva'
+    assert response.json['id_aluno'] == 1
+    assert response.json['nome_completo'] == 'João da Silva'
+    assert response.json['data_nascimento'] == '2000-01-01'
+    assert response.json['id_turma'] == 1
 
-# Teste para obter um aluno que não existe
-def test_get_aluno_nao_encontrado(client):
-    response = client.get('/alunos/99999')
+def test_get_aluno_nao_encontrado(client, mocker):
+    mock_conn = mock.MagicMock()
+    mock_cursor = mock.MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+    mock_cursor.fetchone.return_value = None
+    
+    mocker.patch('Util.bd.create_connection', return_value=mock_conn)
+    
+    response = client.get('/alunos/999')
     
     assert response.status_code == 404
+    assert "não encontrado" in response.json['error']
 
-# Teste para adicionar um novo aluno
 def test_add_aluno(client, mocker):
     novo_aluno = {
-        "aluno_id": "67890",
-        "nome": "Maria Oliveira",
-        "endereco": "Rua B, 456",
-        "cidade": "Rio de Janeiro",
-        "estado": "RJ",
-        "cep": "12345678",
-        "pais": "Brasil",
-        "telefone": "987654321"
+        "nome_completo": "Maria Oliveira",
+        "data_nascimento": "2001-05-15",
+        "id_turma": 1,
+        "nome_responsavel": "José Oliveira",
+        "telefone_responsavel": "11888888888",
+        "email_responsavel": "jose@email.com",
+        "informacoes_adicionais": "Aluna dedicada"
     }
-    mocker.patch('app.util.bd.create_connection', return_value=None)
+    
+    mock_conn = mock.MagicMock()
+    mock_cursor = mock.MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+    mock_cursor.fetchone.return_value = (1, "Turma A", 1, "08:00-12:00")  # Mock da turma existente
+    
+    mocker.patch('Util.bd.create_connection', return_value=mock_conn)
     
     response = client.post('/alunos', json=novo_aluno)
     
     assert response.status_code == 201
-    assert response.json['aluno_id'] == '67890'
-    assert response.json['nome'] == 'Maria Oliveira'
+    assert "Aluno adicionado" in response.json['message']
 
-# Teste para atualizar um aluno existente
+def test_add_aluno_campos_obrigatorios(client, mocker):
+    aluno_incompleto = {
+        "nome_completo": "Maria Oliveira"
+        # Faltando campos obrigatórios
+    }
+    
+    response = client.post('/alunos', json=aluno_incompleto)
+    
+    assert response.status_code == 400
+    assert "Campos obrigatórios" in response.json['error']
+
 def test_update_aluno(client, mocker):
     aluno_atualizado = {
-        "nome": "João da Silva Jr.",
-        "endereco": "Rua A, 123",
-        "cidade": "São Paulo",
-        "estado": "SP",
-        "cep": "01234567",
-        "pais": "Brasil",
-        "telefone": "123456789"
+        "nome_completo": "João da Silva Jr.",
+        "data_nascimento": "2000-01-01",
+        "id_turma": 2,
+        "nome_responsavel": "Maria Silva Jr.",
+        "telefone_responsavel": "11777777777",
+        "email_responsavel": "maria.jr@email.com",
+        "informacoes_adicionais": "Atualizado"
     }
-    mocker.patch('app.util.bd.create_connection', return_value=None)
     
-    response = client.put('/alunos/12345', json=aluno_atualizado)
+    mock_conn = mock.MagicMock()
+    mock_cursor = mock.MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+    
+    mocker.patch('Util.bd.create_connection', return_value=mock_conn)
+    
+    response = client.put('/alunos/1', json=aluno_atualizado)
     
     assert response.status_code == 200
-    assert response.json['nome'] == 'João da Silva Jr.'
+    assert "Aluno atualizado" in response.json['message']
 
-# Teste para deletar um aluno existente
 def test_delete_aluno(client, mocker):
-    mocker.patch('app.util.bd.create_connection', return_value=None)
+    mock_conn = mock.MagicMock()
+    mock_cursor = mock.MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
     
-    response = client.delete('/alunos/12345')
+    mocker.patch('Util.bd.create_connection', return_value=mock_conn)
     
-    assert response.status_code == 204
+    response = client.delete('/alunos/1')
+    
+    assert response.status_code == 200
+    assert "Aluno deletado" in response.json['message']

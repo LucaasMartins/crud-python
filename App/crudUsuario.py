@@ -14,7 +14,7 @@ def adicionar_usuario():
     try:
         cursor.execute(
             """
-            INSERT INTO usuarios (login, senha, nivel_acesso, id_professor)
+            INSERT INTO usuario (login, senha, nivel_acesso, id_professor)
             VALUES (%s, %s, %s, %s)
             """,
             (data['login'], data['senha'], data['nivel_acesso'], data['id_professor'])
@@ -37,7 +37,7 @@ def read_usuario(id_usuario):
     try:
         cursor.execute(
             """
-            SELECT * FROM usuarios WHERE id_professor = %s
+            SELECT * FROM usuario WHERE id_usuario = %s
             """,
             (id_usuario,)
         )
@@ -57,7 +57,7 @@ def read_usuario(id_usuario):
         cursor.close()
         conn.close()
 
-@app.route('usuarios/<int:id_usuario>', methods=['PUT'])
+@app.route('/usuarios/<int:id_usuario>', methods=['PUT'])
 def update_usuario(id_usuario):
     data = request.get_json()
     conn = bd.create_connection()
@@ -67,9 +67,9 @@ def update_usuario(id_usuario):
     try:
         cursor.execute(
             """
-            UPDATE usuarios
-            SET login = %s, senha = %s, nivel_acesso = %s,
-            id_professor = %s
+            UPDATE usuario
+            SET login = %s, senha = %s, nivel_acesso = %s, id_professor = %s
+            WHERE id_usuario = %s
             """,
             (data['login'], data['senha'], data['nivel_acesso'], data['id_professor'],
              id_usuario)
@@ -83,7 +83,7 @@ def update_usuario(id_usuario):
         cursor.close()
         conn.close()
 
-@app.route('/professor/<int:id.usuario>', methods=['DELETE'])
+@app.route('/usuarios/<int:id_usuario>', methods=['DELETE'])
 def delete_usuario(id_usuario):
     conn = bd.create_connection()
     if conn is None:
@@ -92,7 +92,7 @@ def delete_usuario(id_usuario):
     try:
         cursor.execute(
             """
-            DELETE FROM usuarios WHERE id_usuario = %s
+            DELETE FROM usuario WHERE id_usuario = %s
             """,
             (id_usuario,)
         )

@@ -3,28 +3,40 @@ from flask import Flask
 import sys
 import os
 
-# Adiciona o diretório raiz do projeto ao path para importar os módulos corretamente
+# Adiciona o diretório raiz do projeto ao path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from App.cruProf import professor_bp
-from App.crudAlunos import app as alunos_app
-from App.crudTurma import turma_bp
-from App.crudPagamento_corrigido import pagamento_bp
 
 @pytest.fixture
 def app():
-    """Cria e configura uma instância Flask para testes."""
+    """Cria uma instância Flask para testes."""
     app = Flask(__name__)
     app.config['TESTING'] = True
+    app.config['DATABASE_URL'] = 'sqlite:///:memory:'  # Banco em memória para testes
     
-    # Registra os blueprints
-    app.register_blueprint(professor_bp)
-    app.register_blueprint(turma_bp)
-    app.register_blueprint(pagamento_bp)
+    # Importa e registra as rotas dos módulos
+    try:
+        from App.crudAlunos import app as alunos_app
+        for rule in alunos_app.url_map.iter_rules():
+            if rule.endpoint != 'static':
+                app.add_url_rule(rule.rule, rule.endpoint, alunos_app.view_functions[rule.endpoint], methods=rule.methods)
+    except ImportError:
+        pass
     
-    # Para o módulo de alunos que não usa blueprint
-    for rule in alunos_app.url_map.iter_rules():
-        app.add_url_rule(rule.rule, rule.endpoint, alunos_app.view_functions[rule.endpoint], methods=rule.methods)
+    try:
+        from App.crudUsuario import app as usuarios_app
+        for rule in usuarios_app.url_map.iter_rules():
+            if rule.endpoint != 'static':
+                app.add_url_rule(rule.rule, rule.endpoint, usuarios_app.view_functions[rule.endpoint], methods=rule.methods)
+    except ImportError:
+        pass
+    
+    try:
+        from App.cruProf import app as prof_app
+        for rule in prof_app.url_map.iter_rules():
+            if rule.endpoint != 'static':
+                app.add_url_rule(rule.rule, rule.endpoint, prof_app.view_functions[rule.endpoint], methods=rule.methods)
+    except ImportError:
+        pass
     
     return app
 

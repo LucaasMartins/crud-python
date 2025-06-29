@@ -8,7 +8,7 @@ app = Flask(__name__)
 def adicionar_presenca():
     data = request.get_json()
 
-    required_fields = ['id_aluno', 'data_presenca', 'status_presenca']
+    required_fields = ['id_aluno', 'data_presenca', 'presente']
 
     if not all([field in data for field in required_fields]):
         return jsonify({"error": "Campos obrigatórios não preenchidos"}), 400
@@ -25,10 +25,10 @@ def adicionar_presenca():
 
         cursor.execute(
             """
-            INSERT INTO presencas (id_aluno, data_presenca, status_presenca)
+            INSERT INTO presenca (id_aluno, data_presenca, presente)
             VALUES (%s, %s, %s)
             """,
-            (data['id_aluno'], data['data_presenca'], data['status_presenca'])
+            (data['id_aluno'], data['data_presenca'], data['presente'])
         )
         conn.commit()
         return jsonify({"message": "Presença adicionada"}), 201
@@ -49,7 +49,7 @@ def read_presenca(id_presenca):
     try:
         cursor.execute(
             """
-            SELECT * FROM presencas WHERE id_presenca = %s
+            SELECT * FROM presenca WHERE id_presenca = %s
             """,
             (id_presenca,)
         )
@@ -60,7 +60,7 @@ def read_presenca(id_presenca):
             "id_presenca": presenca[0],
             "id_aluno": presenca[1],
             "data_presenca": presenca[2],
-            "status_presenca": presenca[3],
+            "presente": presenca[3],
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -78,10 +78,10 @@ def update_presenca(id_presenca):
     try:
         cursor.execute(
             """
-            UPDATE presencas SET id_aluno = %s, data_presenca = %s, status_presenca = %s
+            UPDATE presenca SET id_aluno = %s, data_presenca = %s, presente = %s
             WHERE id_presenca = %s
             """,
-            (data['id_aluno'], data['data_presenca'], data['status_presenca'], id_presenca)
+            (data['id_aluno'], data['data_presenca'], data['presente'], id_presenca)
         )
         conn.commit()
         return jsonify({"message": "Presença atualizada"}), 200
@@ -101,7 +101,7 @@ def delete_presenca(id_presenca):
     try:
         cursor.execute(
             """
-            DELETE FROM presencas WHERE id_presenca = %s
+            DELETE FROM presenca WHERE id_presenca = %s
             """,
             (id_presenca,)
         )

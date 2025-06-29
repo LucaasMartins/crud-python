@@ -81,3 +81,43 @@ def test_delete_usuario(client, mocker):
     
     assert response.status_code == 200
     assert "Usuario deletado" in response.json['message']
+
+def test_add_usuario_login_duplicado(client, mocker):
+    usuario_duplicado = {
+        "login": "admin",
+        "senha": "senha123",
+        "nivel_acesso": "administrador",
+        "id_professor": 1
+    }
+    
+    mock_conn = mock.MagicMock()
+    mock_cursor = mock.MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+    mock_cursor.execute.side_effect = Exception("Login já existe")
+    
+    mocker.patch('Util.bd.create_connection', return_value=mock_conn)
+    
+    response = client.post('/usuarios', json=usuario_duplicado)
+    
+    assert response.status_code == 500
+    assert "error" in response.json
+
+def test_add_usuario_senha_vazia(client, mocker):
+    usuario_senha_vazia = {
+        "login": "novo_usuario",
+        "senha": "",
+        "nivel_acesso": "professor",
+        "id_professor": 2
+    }
+    
+    mock_conn = mock.MagicMock()
+    mock_cursor = mock.MagicMock()
+    mock_conn.cursor.return_value = mock_cursor
+    mock_cursor.execute.side_effect = Exception("Senha não pode ser vazia")
+    
+    mocker.patch('Util.bd.create_connection', return_value=mock_conn)
+    
+    response = client.post('/usuarios', json=usuario_senha_vazia)
+    
+    assert response.status_code == 500
+    assert "error" in response.json

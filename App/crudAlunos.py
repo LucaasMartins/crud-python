@@ -21,7 +21,7 @@ def adicionar_aluno():
 
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT * FROM turmas WHERE id_turma = %s", (data['id_turma'],))
+        cursor.execute("SELECT * FROM turma WHERE id_turma = %s", (data['id_turma'],))
         turma = cursor.fetchone()
 
         if turma is None:
@@ -29,11 +29,11 @@ def adicionar_aluno():
 
         cursor.execute(
             """
-            INSERT INTO alunos (nome_completo, data_nascimento, nome_responsavel, telefone_responsavel,
+            INSERT INTO alunos (nome_completo, data_nascimento, id_turma, nome_responsavel, telefone_responsavel,
             email_responsavel, informacoes_adicionais)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             """,
-            (data['nome_completo'], data['data_nascimento'], data['nome_responsavel'], data['telefone_responsavel'], 
+            (data['nome_completo'], data['data_nascimento'], data['id_turma'], data['nome_responsavel'], data['telefone_responsavel'], 
              data['email_responsavel'], data.get('informacoes_adicionais', ''))
         )
         conn.commit()
@@ -65,10 +65,11 @@ def read_aluno(id_aluno):
             "id_aluno": aluno[0],
             "nome_completo": aluno[1],
             "data_nascimento": aluno[2],
-            "nome_responsavel": aluno[3],
-            "telefone_responsavel": aluno[4],
-            "email_responsavel": aluno[5],
-            "informacoes_adicionais": aluno[6],
+            "id_turma": aluno[3],
+            "nome_responsavel": aluno[4],
+            "telefone_responsavel": aluno[5],
+            "email_responsavel": aluno[6],
+            "informacoes_adicionais": aluno[7],
         }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -87,11 +88,11 @@ def update_aluno(id_aluno):
         cursor.execute(
             """
             UPDATE alunos
-            SET nome_completo = %s, data_nascimento = %s, nome_responsavel = %s, telefone_responsavel = %s, 
+            SET nome_completo = %s, data_nascimento = %s, id_turma = %s, nome_responsavel = %s, telefone_responsavel = %s, 
             email_responsavel = %s, informacoes_adicionais = %s
             WHERE id_aluno = %s
             """,
-            (data['nome_completo'], data['data_nascimento'], data['nome_responsavel'], data['telefone_responsavel'], 
+            (data['nome_completo'], data['data_nascimento'], data['id_turma'], data['nome_responsavel'], data['telefone_responsavel'], 
              data['email_responsavel'], data['informacoes_adicionais'], id_aluno)
         )
         conn.commit()

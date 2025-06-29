@@ -2,7 +2,7 @@ import pytest
 from unittest import mock
 
 def test_get_atividade(client, mocker):
-    atividade_mock = (1, 1, "2023-06-01", "prova", "Prova de matemática", "Primeira avaliação")
+    atividade_mock = (1, "Prova de Matemática", "2023-06-15")
     
     mock_conn = mock.MagicMock()
     mock_cursor = mock.MagicMock()
@@ -15,9 +15,8 @@ def test_get_atividade(client, mocker):
     
     assert response.status_code == 200
     assert response.json['id_atividade'] == 1
-    assert response.json['id_turma'] == 1
-    assert response.json['tipo_atividade'] == "prova"
-    assert response.json['descricao_atividade'] == "Prova de matemática"
+    assert response.json['descricao'] == "Prova de Matemática"
+    assert response.json['data_realizacao'] == "2023-06-15"
 
 def test_get_atividade_nao_encontrada(client, mocker):
     mock_conn = mock.MagicMock()
@@ -34,18 +33,13 @@ def test_get_atividade_nao_encontrada(client, mocker):
 
 def test_add_atividade(client, mocker):
     nova_atividade = {
-        "id_turma": 1,
-        "data_atividade": "2023-06-01",
-        "tipo_atividade": "exercicio",
-        "descricao_atividade": "Lista de exercícios",
-        "observacoes_atividade": "Para casa"
+        "descricao": "Trabalho de História",
+        "data_realizacao": "2023-06-20"
     }
     
     mock_conn = mock.MagicMock()
     mock_cursor = mock.MagicMock()
     mock_conn.cursor.return_value = mock_cursor
-    # Mock para encontrar a turma
-    mock_cursor.fetchone.return_value = (1, "Turma A")
     
     mocker.patch('Util.bd.create_connection', return_value=mock_conn)
     
@@ -56,9 +50,7 @@ def test_add_atividade(client, mocker):
 
 def test_add_atividade_campos_obrigatorios(client):
     atividade_incompleta = {
-        "id_turma": 1,
-        "data_atividade": "2023-06-01"
-        # Faltando outros campos obrigatórios
+        "descricao": "Trabalho incompleto"
     }
     
     response = client.post('/atividade', json=atividade_incompleta)
@@ -66,35 +58,10 @@ def test_add_atividade_campos_obrigatorios(client):
     assert response.status_code == 400
     assert "Campos obrigatórios" in response.json['error']
 
-def test_add_atividade_turma_nao_encontrada(client, mocker):
-    nova_atividade = {
-        "id_turma": 999,
-        "data_atividade": "2023-06-01",
-        "tipo_atividade": "exercicio",
-        "descricao_atividade": "Lista de exercícios",
-        "observacoes_atividade": "Para casa"
-    }
-    
-    mock_conn = mock.MagicMock()
-    mock_cursor = mock.MagicMock()
-    mock_conn.cursor.return_value = mock_cursor
-    # Mock para não encontrar a turma
-    mock_cursor.fetchone.return_value = None
-    
-    mocker.patch('Util.bd.create_connection', return_value=mock_conn)
-    
-    response = client.post('/atividade', json=nova_atividade)
-    
-    assert response.status_code == 404
-    assert "Turma não encontrada" in response.json['error']
-
 def test_update_atividade(client, mocker):
     atividade_atualizada = {
-        "id_turma": 1,
-        "data_atividade": "2023-06-02",
-        "tipo_atividade": "prova",
-        "descricao_atividade": "Prova final",
-        "observacoes_atividade": "Avaliação final"
+        "descricao": "Prova de Matemática - Atualizada",
+        "data_realizacao": "2023-06-25"
     }
     
     mock_conn = mock.MagicMock()

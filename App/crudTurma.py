@@ -12,7 +12,7 @@ def adicionar_turma():
         return jsonify({"error": "Connection to DB failed"}), 500
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT id_professor FROM professores WHERE nome_completo = %s", (data['nome_completo'],))
+        cursor.execute("SELECT id_professor FROM professor WHERE nome_completo = %s", (data['nome_completo'],))
         professor = cursor.fetchone()
         
         if professor is None:
@@ -22,7 +22,7 @@ def adicionar_turma():
         
         cursor.execute(
             """
-            INSERT INTO turmas (nome_turma, id_professor, horario)
+            INSERT INTO turma (nome_turma, id_professor, horario)
             VALUES (%s, %s, %s)
             """,
             (data['nome_turma'], id_professor, data['horario'])
@@ -45,7 +45,7 @@ def read_turma(id_turma):
     try:
         cursor.execute(
             """
-            SELECT * FROM turmas WHERE id_turma = %s
+            SELECT * FROM turma WHERE id_turma = %s
             """,
             (id_turma,)
         )
@@ -74,7 +74,7 @@ def update_turma(id_turma):
     try:
         cursor.execute(
             """
-            UPDATE turmas
+            UPDATE turma
             SET nome_turma = %s, id_professor = %s, horario = %s
             WHERE id_turma = %s
             """,
@@ -99,7 +99,7 @@ def delete_turma(id_turma):
     try:
         cursor.execute(
             """
-            DELETE FROM turmas WHERE id_turma = %s
+            DELETE FROM turma WHERE id_turma = %s
             """,
             (id_turma,)
         )
