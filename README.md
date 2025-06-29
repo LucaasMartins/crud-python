@@ -2,6 +2,7 @@
 
 ![Python](https://img.shields.io/badge/python-3.9-blue.svg)
 ![Flask](https://img.shields.io/badge/flask-2.3.3-green.svg)
+![Docker](https://img.shields.io/badge/docker-compose-blue.svg)
 
 Sistema CRUD para gestão escolar desenvolvido em Python com Flask.
 
@@ -13,37 +14,57 @@ Sistema CRUD para gestão escolar desenvolvido em Python com Flask.
 - ✅ CRUD de Turmas
 - ✅ CRUD de Pagamentos
 - ✅ Sistema de Presença
+- ✅ Monitoramento com Prometheus e Grafana
 
 ## 🛠️ Tecnologias
 
 - **Backend**: Python, Flask
 - **Banco**: PostgreSQL
+- **Containerização**: Docker, Docker Compose
+- **Monitoramento**: Prometheus, Grafana
 - **Testes**: Pytest
-- **CI/CD**: GitHub Actions
 
-## 📦 Instalação
+## 📋 Pré-requisitos
 
+- [Docker](https://www.docker.com/get-started) instalado
+- [Docker Compose](https://docs.docker.com/compose/install/) instalado
+- [Git](https://git-scm.com/) instalado
+
+## 🚀 Como executar
+
+### 1. Clone o repositório
 ```bash
-# Clone o repositório
 git clone https://github.com/LucaasMartins/crud-python.git
-
-# Entre no diretório
 cd crud-python
-
-# Instale as dependências
-pip install -r requirements.txt
-
-# Execute os testes
-pytest
 ```
 
-## 🔄 CI/CD
+### 2. Execute a aplicação
+```bash
+docker-compose up --build
+```
 
-O projeto utiliza GitHub Actions para:
-- ✅ Executar testes automaticamente
-- ✅ Verificar qualidade do código
-- ✅ Deploy automático na branch main
+### 3. Acesse a aplicação
+- **API**: http://localhost:5000
+- **Grafana**: http://localhost:3000 (admin/admin)
+- **Prometheus**: http://localhost:9090
 
-## 📊 Status dos Testes
+## 🧪 Testando
 
-Os testes são executados automaticamente a cada push e pull request.
+Verifique se a API está funcionando:
+```bash
+curl http://localhost:5000/
+```
+
+Resposta esperada:
+```json
+{
+  "message": "API Sistema Escolar",
+  "status": "running"
+}
+```
+
+## 🛑 Parar a aplicação
+
+```bash
+docker-compose down
+```
