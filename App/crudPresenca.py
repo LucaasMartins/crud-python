@@ -1,10 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
 import Util.bd as bd
-import base64
 
-app = Flask(__name__)
+presencas_bp = Blueprint('presencas', __name__)
 
-@app.route('/presencas', methods=['POST'])
+@presencas_bp.route('/presencas', methods=['POST'])
 def adicionar_presenca():
     data = request.get_json()
 
@@ -39,7 +38,7 @@ def adicionar_presenca():
         cursor.close()
         conn.close()
 
-@app.route('/presencas/<int:id_presenca>', methods=['GET'])
+@presencas_bp.route('/presencas/<int:id_presenca>', methods=['GET'])
 def read_presenca(id_presenca):
     conn = bd.create_connection()
     if conn is None:
@@ -68,7 +67,7 @@ def read_presenca(id_presenca):
         cursor.close()
         conn.close()
 
-@app.route('/presencas/<int:id_presenca>', methods=['PUT'])
+@presencas_bp.route('/presencas/<int:id_presenca>', methods=['PUT'])
 def update_presenca(id_presenca):
     data = request.get_json()
     conn = bd.create_connection()
@@ -92,7 +91,7 @@ def update_presenca(id_presenca):
         cursor.close()
         conn.close()
 
-@app.route('/presencas/<int:id_presenca>', methods=['DELETE'])
+@presencas_bp.route('/presencas/<int:id_presenca>', methods=['DELETE'])
 def delete_presenca(id_presenca):
     conn = bd.create_connection()
     if conn is None:
@@ -114,5 +113,3 @@ def delete_presenca(id_presenca):
         cursor.close()
         conn.close()
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)

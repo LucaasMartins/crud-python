@@ -1,11 +1,44 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
 import Util.bd as bd
-import base64
 
-app = Flask(__name__)
+turmas_bp = Blueprint('turmas', __name__)
 
-@app.route('/turmas', methods=['POST'])
+@turmas_bp.route('/turmas', methods=['POST'])
 def adicionar_turma():
+    """
+    Criar uma nova turma
+    ---
+    tags:
+      - Turmas
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - nome_completo
+            - nome_turma
+            - horario
+          properties:
+            nome_completo:
+              type: string
+              example: "João Silva"
+              description: Nome do professor responsável
+            nome_turma:
+              type: string
+              example: "Turma A"
+            horario:
+              type: string
+              example: "08:00-12:00"
+    responses:
+      201:
+        description: Turma criada com sucesso
+      400:
+        description: Dados inválidos
+      404:
+        description: Professor não encontrado
+    """
     data = request.get_json()
     
     required_fields = ['nome_completo', 'nome_turma', 'horario']
@@ -42,8 +75,25 @@ def adicionar_turma():
         cursor.close()
         conn.close()
         
-@app.route('/turmas/<int:id_turma>', methods=['GET'])
+@turmas_bp.route('/turmas/<int:id_turma>', methods=['GET'])
 def read_turma(id_turma):
+    """
+    Buscar turma por ID
+    ---
+    tags:
+      - Turmas
+    parameters:
+      - name: id_turma
+        in: path
+        type: integer
+        required: true
+        description: ID da turma
+    responses:
+      200:
+        description: Turma encontrada
+      404:
+        description: Turma não encontrada
+    """
     conn = bd.create_connection()
     if conn is None:
         return jsonify({"error": "Connection to DB failed"}), 500
@@ -70,7 +120,7 @@ def read_turma(id_turma):
         cursor.close()
         conn.close()
 
-@app.route('/turmas/<int:id_turma>', methods=['PUT'])
+@turmas_bp.route('/turmas/<int:id_turma>', methods=['PUT'])
 def update_turma(id_turma):
     data = request.get_json()
     conn = bd.create_connection()
@@ -96,7 +146,7 @@ def update_turma(id_turma):
         cursor.close()
         conn.close()
 
-@app.route('/turmas/<int:id_turma>', methods=['DELETE'])
+@turmas_bp.route('/turmas/<int:id_turma>', methods=['DELETE'])
 def delete_turma(id_turma):
     conn = bd.create_connection()
     if conn is None:
@@ -118,5 +168,3 @@ def delete_turma(id_turma):
         cursor.close()
         conn.close()
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)

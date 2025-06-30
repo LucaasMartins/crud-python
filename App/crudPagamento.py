@@ -1,9 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
 import Util.bd as bd
 
-app = Flask(__name__)
+pagamentos_bp = Blueprint('pagamentos', __name__)
 
-@app.route('/pagamentos', methods=['POST'])
+@pagamentos_bp.route('/pagamentos', methods=['POST'])
 def adicionar_pagamento():
     data = request.get_json()
 
@@ -37,7 +37,7 @@ def adicionar_pagamento():
     finally:
         cursor.close()
         conn.close()
-@app.route('/pagamentos/<int:id_pagamento>', methods=['GET'])
+@pagamentos_bp.route('/pagamentos/<int:id_pagamento>', methods=['GET'])
 def read_pagamento(id_pagamento):
     conn = bd.create_connection()
     if conn is None:
@@ -70,7 +70,7 @@ def read_pagamento(id_pagamento):
         conn.close()
 
 
-@app.route('/pagamentos/<int:id_pagamento>', methods=['PUT'])
+@pagamentos_bp.route('/pagamentos/<int:id_pagamento>', methods=['PUT'])
 def update_pagamento(id_pagamento):
     data = request.get_json()
     conn = bd.create_connection()
@@ -97,7 +97,7 @@ def update_pagamento(id_pagamento):
         conn.close()
 
 # Método para deletar um pagamento
-@app.route('/pagamentos/<int:id_pagamento>', methods=['DELETE'])
+@pagamentos_bp.route('/pagamentos/<int:id_pagamento>', methods=['DELETE'])
 def delete_pagamento(id_pagamento):
     conn = bd.create_connection()
     if conn is None:
@@ -120,5 +120,3 @@ def delete_pagamento(id_pagamento):
         cursor.close()
         conn.close()
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)

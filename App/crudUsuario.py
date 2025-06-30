@@ -1,9 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
 import Util.bd as bd
 
-app = Flask(__name__)
+usuarios_bp = Blueprint('usuarios', __name__)
 
-@app.route('/usuarios', methods=['POST'])
+@usuarios_bp.route('/usuarios', methods=['POST'])
 def adicionar_usuario():
     data = request.get_json()
     
@@ -33,7 +33,7 @@ def adicionar_usuario():
         cursor.close()
         conn.close()
 
-@app.route('/usuarios/<int:id_usuario>', methods=['GET'])
+@usuarios_bp.route('/usuarios/<int:id_usuario>', methods=['GET'])
 def read_usuario(id_usuario):
     conn = bd.create_connection()
     if conn is None:
@@ -62,7 +62,7 @@ def read_usuario(id_usuario):
         cursor.close()
         conn.close()
 
-@app.route('/usuarios/<int:id_usuario>', methods=['PUT'])
+@usuarios_bp.route('/usuarios/<int:id_usuario>', methods=['PUT'])
 def update_usuario(id_usuario):
     data = request.get_json()
     conn = bd.create_connection()
@@ -88,7 +88,7 @@ def update_usuario(id_usuario):
         cursor.close()
         conn.close()
 
-@app.route('/usuarios/<int:id_usuario>', methods=['DELETE'])
+@usuarios_bp.route('/usuarios/<int:id_usuario>', methods=['DELETE'])
 def delete_usuario(id_usuario):
     conn = bd.create_connection()
     if conn is None:
@@ -110,5 +110,3 @@ def delete_usuario(id_usuario):
         cursor.close()
         conn.close()
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)

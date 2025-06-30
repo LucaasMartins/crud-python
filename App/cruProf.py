@@ -1,10 +1,41 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
 import Util.bd as bd
 
-app = Flask(__name__)
+prof_bp = Blueprint('professores', __name__)
 
-@app.route('/professores', methods=['POST'])
+@prof_bp.route('/professores', methods=['POST'])
 def adicionar_professor():
+    """
+    Criar um novo professor
+    ---
+    tags:
+      - Professores
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - nome_completo
+            - email
+            - telefone
+          properties:
+            nome_completo:
+              type: string
+              example: "João Silva"
+            email:
+              type: string
+              example: "joao@email.com"
+            telefone:
+              type: string
+              example: "11999999999"
+    responses:
+      201:
+        description: Professor criado com sucesso
+      400:
+        description: Dados inválidos
+    """
     data = request.get_json()
     
     required_fields = ['nome_completo', 'email', 'telefone']
@@ -33,8 +64,25 @@ def adicionar_professor():
         cursor.close()
         conn.close()
         
-@app.route('/professores/<int:id_professor>', methods=['GET'])
+@prof_bp.route('/professores/<int:id_professor>', methods=['GET'])
 def read_professor(id_professor):
+    """
+    Buscar professor por ID
+    ---
+    tags:
+      - Professores
+    parameters:
+      - name: id_professor
+        in: path
+        type: integer
+        required: true
+        description: ID do professor
+    responses:
+      200:
+        description: Professor encontrado
+      404:
+        description: Professor não encontrado
+    """
     conn = bd.create_connection()
     if conn is None:
         return jsonify({"error": "Connection to DB failed"}), 500
@@ -61,7 +109,7 @@ def read_professor(id_professor):
         cursor.close()
         conn.close()
         
-@app.route('/professores/<int:id_professor>', methods=['PUT'])
+@prof_bp.route('/professores/<int:id_professor>', methods=['PUT'])
 def update_professor(id_professor):
     data = request.get_json()
     conn = bd.create_connection()
@@ -87,7 +135,7 @@ def update_professor(id_professor):
         cursor.close()
         conn.close()
         
-@app.route('/professores/<int:id_professor>', methods=['DELETE'])
+@prof_bp.route('/professores/<int:id_professor>', methods=['DELETE'])
 def delete_professor(id_professor):
     conn = bd.create_connection()
     if conn is None:
@@ -109,5 +157,3 @@ def delete_professor(id_professor):
         cursor.close()
         conn.close()
         
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)

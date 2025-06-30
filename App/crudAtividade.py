@@ -1,10 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
 import Util.bd as bd
-import base64
 
-app = Flask(__name__)
+atividades_bp = Blueprint('atividades', __name__)
 
-@app.route('/atividade', methods=['POST'])
+@atividades_bp.route('/atividade', methods=['POST'])
 def adicionar_atividade():
     data = request.get_json()
 
@@ -33,7 +32,7 @@ def adicionar_atividade():
         cursor.close()
         conn.close()
 
-@app.route('/atividade/<int:id_atividade>', methods=['GET'])
+@atividades_bp.route('/atividade/<int:id_atividade>', methods=['GET'])
 def read_atividade(id_atividade):
     conn = bd.create_connection()
     if conn is None:
@@ -61,7 +60,7 @@ def read_atividade(id_atividade):
         cursor.close()
         conn.close()
 
-@app.route('/atividade/<int:id_atividade>', methods=['PUT'])
+@atividades_bp.route('/atividade/<int:id_atividade>', methods=['PUT'])
 def update_atividade(id_atividade):
     data = request.get_json()
 
@@ -93,7 +92,7 @@ def update_atividade(id_atividade):
         cursor.close()
         conn.close()
 
-@app.route('/atividade/<int:id_atividade>', methods=['DELETE'])
+@atividades_bp.route('/atividade/<int:id_atividade>', methods=['DELETE'])
 def delete_atividade(id_atividade):
     conn = bd.create_connection()
     if conn is None:
@@ -116,5 +115,3 @@ def delete_atividade(id_atividade):
         cursor.close()
         conn.close()
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)

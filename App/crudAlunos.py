@@ -1,10 +1,59 @@
-from flask import Flask, request, jsonify
+from flask import Blueprint, request, jsonify
 import Util.bd as bd
 
-app = Flask(__name__)
+alunos_bp = Blueprint('alunos', __name__)
 
-@app.route('/alunos', methods=['POST'])
+@alunos_bp.route('/alunos', methods=['POST'])
 def adicionar_aluno():
+    """
+    Criar um novo aluno
+    ---
+    tags:
+      - Alunos
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          required:
+            - nome_completo
+            - data_nascimento
+            - id_turma
+            - nome_responsavel
+            - telefone_responsavel
+            - email_responsavel
+          properties:
+            nome_completo:
+              type: string
+              example: "Maria Santos"
+            data_nascimento:
+              type: string
+              format: date
+              example: "2010-05-15"
+            id_turma:
+              type: integer
+              example: 1
+            nome_responsavel:
+              type: string
+              example: "Ana Santos"
+            telefone_responsavel:
+              type: string
+              example: "11888888888"
+            email_responsavel:
+              type: string
+              example: "ana@email.com"
+            informacoes_adicionais:
+              type: string
+              example: "Observações gerais"
+    responses:
+      201:
+        description: Aluno criado com sucesso
+      400:
+        description: Dados inválidos
+      404:
+        description: Turma não encontrada
+    """
     data = request.get_json()
 
     required_fields = ['nome_completo', 'data_nascimento', 'id_turma', 'nome_responsavel',
@@ -44,8 +93,25 @@ def adicionar_aluno():
         cursor.close()
         conn.close()
 
-@app.route('/alunos/<int:id_aluno>', methods=['GET'])
+@alunos_bp.route('/alunos/<int:id_aluno>', methods=['GET'])
 def read_aluno(id_aluno):
+    """
+    Buscar aluno por ID
+    ---
+    tags:
+      - Alunos
+    parameters:
+      - name: id_aluno
+        in: path
+        type: integer
+        required: true
+        description: ID do aluno
+    responses:
+      200:
+        description: Aluno encontrado
+      404:
+        description: Aluno não encontrado
+    """
     conn = bd.create_connection()
     if conn is None:
         return jsonify({"error": "Connection to DB failed"}), 500
@@ -76,7 +142,7 @@ def read_aluno(id_aluno):
         cursor.close()
         conn.close()
 
-@app.route('/alunos/<int:id_aluno>', methods=['PUT'])
+@alunos_bp.route('/alunos/<int:id_aluno>', methods=['PUT'])
 def update_aluno(id_aluno):
     data = request.get_json()
     conn = bd.create_connection()
@@ -103,7 +169,7 @@ def update_aluno(id_aluno):
         cursor.close()
         conn.close()
 
-@app.route('/alunos/<int:id_aluno>', methods=['DELETE'])
+@alunos_bp.route('/alunos/<int:id_aluno>', methods=['DELETE'])
 def delete_aluno(id_aluno):
     conn = bd.create_connection()
     if conn is None:
@@ -125,5 +191,4 @@ def delete_aluno(id_aluno):
         cursor.close()
         conn.close()
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+

@@ -3,66 +3,93 @@ from flask import Flask
 
 app = Flask(__name__)
 
-# Importando as rotas dos módulos
+# Configuração do Swagger será adicionada após testar
 try:
-    from crudAlunos import app as alunos_app
-    for rule in alunos_app.url_map.iter_rules():
-        if rule.endpoint != 'static':
-            app.add_url_rule(rule.rule, rule.endpoint, alunos_app.view_functions[rule.endpoint], methods=rule.methods)
+    from flasgger import Swagger
+    swagger_config = {
+        "headers": [],
+        "specs": [
+            {
+                "endpoint": 'apispec',
+                "route": '/apispec.json',
+                "rule_filter": lambda rule: True,
+                "model_filter": lambda tag: True,
+            }
+        ],
+        "static_url_path": "/flasgger_static",
+        "swagger_ui": True,
+        "specs_route": "/apidocs/"
+    }
+    
+    swagger_template = {
+        "swagger": "2.0",
+        "info": {
+            "title": "Sistema Escolar API",
+            "description": "API CRUD para gestão escolar",
+            "version": "1.0.0"
+        },
+        "host": "localhost:5000",
+        "basePath": "/",
+        "schemes": ["http"]
+    }
+    
+    swagger = Swagger(app, config=swagger_config, template=swagger_template)
+    print("Swagger configurado com sucesso")
+except ImportError:
+    print("Swagger não disponível - continuando sem documentação")
+
+# Importando e registrando os Blueprints
+try:
+    from crudAlunos import alunos_bp
+    app.register_blueprint(alunos_bp)
 except ImportError:
     print("Módulo crudAlunos não encontrado")
 
 try:
-    from cruProf import app as prof_app
-    for rule in prof_app.url_map.iter_rules():
-        if rule.endpoint != 'static':
-            app.add_url_rule(rule.rule, rule.endpoint, prof_app.view_functions[rule.endpoint], methods=rule.methods)
+    from cruProf import prof_bp
+    app.register_blueprint(prof_bp)
 except ImportError:
     print("Módulo cruProf não encontrado")
 
 try:
-    from crudUsuario import app as usuario_app
-    for rule in usuario_app.url_map.iter_rules():
-        if rule.endpoint != 'static':
-            app.add_url_rule(rule.rule, rule.endpoint, usuario_app.view_functions[rule.endpoint], methods=rule.methods)
+    from crudUsuario import usuarios_bp
+    app.register_blueprint(usuarios_bp)
 except ImportError:
     print("Módulo crudUsuario não encontrado")
 
 try:
-    from crudTurma import app as turma_app
-    for rule in turma_app.url_map.iter_rules():
-        if rule.endpoint != 'static':
-            app.add_url_rule(rule.rule, rule.endpoint, turma_app.view_functions[rule.endpoint], methods=rule.methods)
+    from crudTurma import turmas_bp
+    app.register_blueprint(turmas_bp)
 except ImportError:
     print("Módulo crudTurma não encontrado")
 
 try:
-    from crudPagamento import app as pagamento_app
-    for rule in pagamento_app.url_map.iter_rules():
-        if rule.endpoint != 'static':
-            app.add_url_rule(rule.rule, rule.endpoint, pagamento_app.view_functions[rule.endpoint], methods=rule.methods)
+    from crudPagamento import pagamentos_bp
+    app.register_blueprint(pagamentos_bp)
 except ImportError:
     print("Módulo crudPagamento não encontrado")
 
 try:
-    from crudPresenca import app as presenca_app
-    for rule in presenca_app.url_map.iter_rules():
-        if rule.endpoint != 'static':
-            app.add_url_rule(rule.rule, rule.endpoint, presenca_app.view_functions[rule.endpoint], methods=rule.methods)
+    from crudPresenca import presencas_bp
+    app.register_blueprint(presencas_bp)
 except ImportError:
     print("Módulo crudPresenca não encontrado")
 
 try:
-    from crudAtividade import app as atividade_app
-    for rule in atividade_app.url_map.iter_rules():
-        if rule.endpoint != 'static':
-            app.add_url_rule(rule.rule, rule.endpoint, atividade_app.view_functions[rule.endpoint], methods=rule.methods)
+    from crudAtividade import atividades_bp
+    app.register_blueprint(atividades_bp)
 except ImportError:
     print("Módulo crudAtividade não encontrado")
 
+try:
+    from crudAtividade_aluno import atividade_aluno_bp
+    app.register_blueprint(atividade_aluno_bp)
+except ImportError:
+    print("Módulo crudAtividade_aluno não encontrado")
+
 @app.route('/')
 def home():
-    return {"message": "API Sistema Escolar", "status": "running"}
+    return {"message": "API Sistema Escolar", "status": "running", "blueprints": len(app.blueprints)}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
